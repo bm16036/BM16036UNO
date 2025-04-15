@@ -1,46 +1,42 @@
 import numpy as np
 
-def jacobi_iterativo(matriz_coeficientes, terminos_independientes, tolerancia=1e-10, max_iter=1000):
+def jacobi_paso_a_paso(A, b, tol=1e-10, max_iter=1000):
     """
-    Resuelve un sistema de ecuaciones lineales utilizando el método iterativo de Jacobi.
-    
+    Método de Jacobi para resolver sistemas lineales, mostrando el proceso paso a paso.
+
     Parámetros:
-      matriz_coeficientes: Matriz (n x n) de coeficientes.
-      terminos_independientes: Vector (n) de términos independientes.
-      tolerancia: Diferencia máxima permitida entre iteraciones.
-      max_iter: Número máximo de iteraciones.
-      
+    - A: matriz de coeficientes (numpy array)
+    - b: vector de términos independientes (numpy array)
+    - tol: tolerancia para el criterio de convergencia
+    - max_iter: número máximo de iteraciones
+
     Retorna:
-      solucion: Vector solución (array de NumPy).
+    - Aproximación de la solución como numpy array
     """
-    A = np.array(matriz_coeficientes, dtype=float)
-    b = np.array(terminos_independientes, dtype=float)
     n = len(b)
-    
-    solucion = np.zeros(n)
-    nueva_solucion = np.zeros(n)
-    
-    print("Método de Jacobi")
-    print("Condición de convergencia: diferencia máxima < {:.4e}".format(tolerancia))
-    
-    for iteracion in range(1, max_iter + 1):
-        print(f"\nIteración {iteracion}:")
+    x = np.zeros(n)
+    x_new = np.zeros(n)
+
+    print("\n==== Método de Jacobi ====")
+    print(f"Condición de parada: diferencia < {tol}\n")
+
+    for k in range(1, max_iter + 1):
+        print(f"Iteración {k}:")
         for i in range(n):
-            suma = 0
-            for j in range(n):
-                if i != j:
-                    suma += A[i, j] * solucion[j]
-            nueva_solucion[i] = (b[i] - suma) / A[i, i]
-            print(f"  Cálculo de x[{i}]: ({b[i]:.4f} - {suma:.4f}) / {A[i, i]:.4f} = {nueva_solucion[i]:.6f}")
-        
-        diferencia = np.linalg.norm(nueva_solucion - solucion, ord=np.inf)
-        print(f"  Diferencia máxima en esta iteración: {diferencia:.6e}")
-        
-        if diferencia < tolerancia:
-            print(f"\nConvergencia alcanzada en {iteracion} iteraciones.")
-            return nueva_solucion
-        
-        solucion = nueva_solucion.copy()
-    
-    print("\nNo se alcanzó la convergencia en el número máximo de iteraciones.")
-    return nueva_solucion
+            suma = sum(A[i, j] * x[j] for j in range(n) if j != i)
+            x_new[i] = (b[i] - suma) / A[i, i]
+            print(f"x[{i}] = ({b[i]:.4f} - {suma:.4f}) / {A[i,i]:.4f} = {x_new[i]:.6f}")
+
+        diff = np.linalg.norm(x_new - x)
+        print(f"Diferencia con la iteración anterior: {diff:.6e}\n")
+
+        if diff < tol:
+            print(f"Convergencia alcanzada en {k} iteraciones.")
+            return x_new
+
+        x = x_new.copy()
+
+    print("No se alcanzó convergencia en el número máximo de iteraciones.")
+    return x_new
+
+
