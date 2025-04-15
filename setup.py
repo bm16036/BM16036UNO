@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="BM16036UNO",
-    version="0.1.0",
+    version="0.1.1",
     author="Erick Alexander Borja Mauricio",
     author_email="bm16036@ues.edu.sv",
     description="Librería para resolver sistemas de ecuaciones lineales y no lineales mediante varios métodos.",

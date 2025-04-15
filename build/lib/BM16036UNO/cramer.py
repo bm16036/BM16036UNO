@@ -1,40 +1,49 @@
 import numpy as np
 
-def metodo_cramer(matriz_coeficientes, terminos_independientes):
+def imprimir_matriz_simple(matriz, nombre="Matriz"):
+    print(f"\n{nombre}:")
+    for fila in matriz:
+        print("  ".join(f"{val:8.3f}" for val in fila))
+
+def metodo_cramer(A, b):
     """
-    Resuelve un sistema de ecuaciones lineales utilizando el método de Cramer.
-    
+    Resuelve un sistema de ecuaciones lineales 3x3 usando el método de Cramer.
+
     Parámetros:
-      matriz_coeficientes: Lista o array (n x n) de coeficientes.
-      terminos_independientes: Lista o array (n) de términos independientes.
-      
+    - A: matriz de coeficientes (3x3)
+    - b: vector de términos independientes (3x1)
+
     Retorna:
-      solucion: Vector solución o No si el sistema no tiene solución única.
+    - Lista con las soluciones [x, y, z] o None si no hay solución única.
     """
-    A = np.array(matriz_coeficientes, dtype=float)
-    b = np.array(terminos_independientes, dtype=float)
-    n = len(b)
-    
-    determinante_principal = np.linalg.det(A)
-    print("Determinante de la matriz de coeficientes (Δ): {:.4f}".format(determinante_principal))
-    
-    if np.isclose(determinante_principal, 0):
-        print("El sistema no tiene solución única, ya que el determinante es cero (Δ = 0).")
+    A = np.array(A, dtype=float)
+    b = np.array(b, dtype=float)
+
+    print("\n==== Método de Cramer ====")
+    print("\nPaso 1: Matriz de coeficientes (A) y vector de términos independientes (b):")
+    imprimir_matriz_simple(A, "A")
+    print(f"\nb = {b}")
+
+    # Determinante principal Δ
+    delta = np.linalg.det(A)
+    print(f"\nPaso 2: Calculamos el determinante de la matriz A (Δ): {delta:.3f}")
+
+    if np.isclose(delta, 0):
+        print("El sistema no tiene solución única (Δ = 0).")
         return None
-    
-    solucion = np.zeros(n)
-    for i in range(n):
-        A_modificada = A.copy()
-        A_modificada[:, i] = b
-        determinante_i = np.linalg.det(A_modificada)
-        solucion[i] = determinante_i / determinante_principal
-        
-        print(f"\nPara la variable x{i+1}:")
-        print("Matriz modificada (columna {0} reemplazada por b):".format(i+1))
-        print(A_modificada)
-        print("Determinante de la matriz modificada (Δ{0}): {1:.4f}".format(i+1, determinante_i))
-        print(f"x{i+1} = Δ{i+1} / Δ = {determinante_i:.4f} / {determinante_principal:.4f} = {solucion[i]:.4f}")
-    
-    print("\nVector solución final:")
-    print(solucion)
-    return solucion
+
+    soluciones = []
+    variables = ['x', 'y', 'z']
+    for i in range(3):
+        A_mod = A.copy()
+        A_mod[:, i] = b
+        delta_i = np.linalg.det(A_mod)
+        print(f"\nPaso 3: Reemplazamos la columna {i} por el vector b y calculamos Δ{variables[i]}:")
+        imprimir_matriz_simple(A_mod, f"A con columna {variables[i]} reemplazada")
+        print(f"Δ{variables[i]} = {delta_i:.3f}")
+        soluciones.append(delta_i / delta)
+        print(f"{variables[i]} = Δ{variables[i]} / Δ = {delta_i:.3f} / {delta:.3f} = {soluciones[-1]:.3f}")
+
+    return soluciones
+
+

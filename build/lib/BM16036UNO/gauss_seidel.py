@@ -1,44 +1,53 @@
 import numpy as np
 
-def gauss_seidel_iterativo(matriz_coeficientes, terminos_independientes, tolerancia=1e-10, max_iter=1000):
+def gauss_seidel_paso_a_paso(A, b, tol=1e-10, max_iter=1000):
     """
-    Resuelve un sistema de ecuaciones lineales utilizando el método iterativo de Gauss-Seidel.
-    
+    Método de Gauss-Seidel para resolver sistemas lineales, mostrando el proceso paso a paso.
+
     Parámetros:
-      matriz_coeficientes: Matriz (n x n) de coeficientes.
-      terminos_independientes: Vector (n) de términos independientes.
-      tolerancia: Diferencia máxima permitida entre iteraciones.
-      max_iter: Número máximo de iteraciones.
-      
+    - A: matriz de coeficientes (numpy array)
+    - b: vector de términos independientes (numpy array)
+    - tol: tolerancia para el criterio de convergencia
+    - max_iter: número máximo de iteraciones
+
     Retorna:
-      solucion: Vector solución.
+    - Aproximación de la solución como numpy array
     """
-    A = np.array(matriz_coeficientes, dtype=float)
-    b = np.array(terminos_independientes, dtype=float)
     n = len(b)
-    
-    solucion = np.zeros(n)
-    
-    print("Método de Gauss-Seidel")
-    print("Condición de convergencia: diferencia máxima < {:.4e}".format(tolerancia))
-    
-    for iteracion in range(1, max_iter + 1):
-        solucion_prev = solucion.copy()
-        print(f"\nIteración {iteracion}:")
+    x = np.zeros(n)
+
+    print("\n==== Método de Gauss-Seidel ====")
+    print(f"Condición de parada: diferencia < {tol}\n")
+
+    for k in range(1, max_iter + 1):
+        x_prev = x.copy()
+        print(f"Iteración {k}:")
         for i in range(n):
-            suma = 0
-            for j in range(n):
-                if j != i:
-                    suma += A[i, j] * solucion[j]
-            solucion[i] = (b[i] - suma) / A[i, i]
-            print(f"  Calculamos x[{i}]: ({b[i]:.4f} - {suma:.4f}) / {A[i, i]:.4f} = {solucion[i]:.6f}")
-        
-        diferencia = np.linalg.norm(solucion - solucion_prev, ord=np.inf)
-        print(f"  Diferencia máxima entre iteraciones: {diferencia:.6e}")
-        
-        if diferencia < tolerancia:
-            print(f"\nConvergencia alcanzada en {iteracion} iteraciones.")
-            return solucion
-    
-    print("\nNo se alcanzó la convergencia en el número máximo de iteraciones.")
-    return solucion
+            suma = sum(A[i, j] * x[j] for j in range(n) if j != i)
+            x[i] = (b[i] - suma) / A[i, i]
+            print(f"x[{i}] = ({b[i]:.4f} - {suma:.4f}) / {A[i,i]:.4f} = {x[i]:.6f}")
+
+        diff = np.linalg.norm(x - x_prev)
+        print(f"Diferencia con la iteración anterior: {diff:.6e}\n")
+
+        if diff < tol:
+            print(f"Convergencia alcanzada en {k} iteraciones.")
+            return x
+
+    print("No se alcanzó convergencia en el número máximo de iteraciones.")
+    return x
+
+# ========================
+# PRUEBA LOCAL
+# ========================
+if __name__ == "__main__":
+    A = np.array([
+        [3, -0.1, -0.2],
+        [0.1, 7, -0.3],
+        [0.3, -0.2, 10]
+    ], dtype=float)
+
+    b = np.array([7.85, -19.3, 71.4], dtype=float)
+
+    solucion = gauss_seidel_paso_a_paso(A, b)
+    print("\nSolución aproximada:", solucion)
